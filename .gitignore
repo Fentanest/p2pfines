@@ -1,0 +1,126 @@
+# ---- Excel / spreadsheet & data files ----
+*.xls
+*.xlsx
+*.xlsm
+*.xlsb
+*.xlt
+*.xltx
+*.xltm
+*.xla
+*.xlam
+*.ods
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.db
+*.sqlite
+*.sqlite3
+*.dat
+~$*
+
+# ---- JSON family (case-insensitive; includes package.json, appsscript.json, .clasp.json) ----
+*.[jJ][sS][oO][nN]
+*.[jJ][sS][oO][nN]5
+*.[jJ][sS][oO][nN][lL]
+*.[jJ][sS][oO][nN][cC]
+
+# ---- Credentials / secrets ----
+.env
+.env.*
+credentials/
+client_secret*
+*service*account*
+*token*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+*.secret
+secrets/
+.clasprc*
+
+# ---- Project data / generated output ----
+.uploads/
+backdata/
+outputs/
+temp/
+tmp/
+tmp_*
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# ---- Node ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+
+# ---- Build artifacts ----
+dist/
+build/
+out/
+.next/
+coverage/
+
+# ---- Executables / packages / archives ----
+*.exe
+*.dll
+*.msi
+*.so
+*.dylib
+*.whl
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.bz2
+
+# ---- Logs / temp / backups ----
+*.log
+*.tmp
+*.temp
+*.bak
+*.backup*
+*.orig
+*.swp
+*~
+* - 복사본*
+
+# ---- IDE / OS ----
+.vscode/
+.idea/
+*.iml
+.agents/
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini

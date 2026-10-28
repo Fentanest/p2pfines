@@ -1,0 +1,1746 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jjukfund 보고서 온라인 업로더</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --line: #d7dce3;
+      --text: #1f2933;
+      --muted: #667085;
+      --blue: #1f6feb;
+      --green: #17803d;
+      --red: #bf1d1d;
+      --shadow: 0 8px 24px rgba(20, 28, 38, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      padding: 18px 24px;
+      background: #14213d;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0; }
+    header span { color: #c9d6ea; font-size: 13px; }
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    h2 { margin: 0 0 14px; font-size: 17px; }
+    h3 { margin: 12px 0 8px; font-size: 14px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 10px;
+      font: inherit;
+      background: white;
+      color: var(--text);
+    }
+    textarea { min-height: 220px; font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    button {
+      border: 1px solid #b8c2d0;
+      background: white;
+      border-radius: 6px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+    }
+    button.primary { background: var(--blue); color: white; border-color: var(--blue); }
+    button.success { background: var(--green); color: white; border-color: var(--green); }
+    button.danger { background: #bf1d1d; color: white; border-color: #bf1d1d; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .drop {
+      border: 2px dashed #9aa8b8;
+      border-radius: 8px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      background: #fbfcfe;
+    }
+    .drop.drag { border-color: var(--blue); background: #eef5ff; color: var(--blue); }
+    .drop strong {
+      display: block;
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .assign-panel {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fcfcfd;
+    }
+    .assign-panel[hidden] { display: none; }
+    .assign-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .assign-file {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+    .assign-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+    }
+    .assign-buttons button {
+      text-align: left;
+      background: white;
+    }
+    .assign-buttons button.primary {
+      text-align: center;
+    }
+    .file-list { display: grid; gap: 12px; margin-top: 14px; }
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .key-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      background: #fcfcfd;
+    }
+    .slot-list {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .target-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+      background: #fcfcfd;
+    }
+    .target-row strong { font-size: 14px; margin-right: 8px; }
+    .target-option {
+      width: auto;
+      display: inline-flex;
+      grid-template-columns: none;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .target-option input { width: auto; }
+    .upload-password-row input {
+      width: 220px;
+      max-width: 100%;
+    }
+    .slot-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: center;
+      background: #fcfcfd;
+    }
+    .slot-row.drag { border-color: var(--blue); background: #eef5ff; }
+    .slot-row strong { display: block; font-size: 14px; }
+    .slot-status {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .slot-row.period-group {
+      grid-template-columns: 220px minmax(0, 1fr);
+      align-items: start;
+    }
+    .period-title {
+      display: grid;
+      gap: 4px;
+    }
+    .group-file-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .ordered-list {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      min-height: 152px;
+      padding: 8px;
+      font: inherit;
+      color: var(--text);
+    }
+    .ordered-list.drag { border-color: var(--blue); background: #eef5ff; }
+    .ordered-list option {
+      padding: 7px 8px;
+      font-size: 13px;
+    }
+    .ordered-list:focus {
+      outline: 2px solid rgba(31, 111, 235, .25);
+      border-color: var(--blue);
+    }
+    .icon-button {
+      width: 32px;
+      height: 30px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .list-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .list-actions button {
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+    .file-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .file-head {
+      display: grid;
+      grid-template-columns: 1fr 240px auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .file-title { font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .pill {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      color: var(--muted);
+      background: #fafbfc;
+      margin-left: 6px;
+    }
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 6px;
+      max-height: 220px;
+      overflow: auto;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fcfcfd;
+    }
+    .columns label {
+      grid-template-columns: auto 1fr;
+      display: grid;
+      align-items: center;
+      gap: 7px;
+      color: var(--text);
+    }
+    .columns input { width: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; white-space: nowrap; }
+    .preview { overflow: auto; max-height: 220px; }
+    .status {
+      border-radius: 6px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #fbfcfe;
+      white-space: pre-wrap;
+    }
+    .status.ok { border-color: #9bd3ad; color: #136c33; background: #f0fff4; }
+    .status.err { border-color: #e7a0a0; color: var(--red); background: #fff5f5; }
+    .progress {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      width: min(760px, calc(100vw - 32px));
+      transform: translateX(-50%);
+      z-index: 100;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #ffffff;
+      box-shadow: 0 14px 36px rgba(20, 28, 38, .18);
+    }
+    .progress.show { display: grid; gap: 8px; }
+    .progress-text { color: var(--muted); font-size: 13px; }
+    .progress-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #e7edf5;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--blue);
+      transition: width .2s ease;
+    }
+    .progress.ok { border-color: #9bd3ad; }
+    .progress.ok .progress-text { color: #136c33; }
+    .progress.ok .progress-fill { background: var(--green); }
+    .progress.err { border-color: #e7a0a0; }
+    .progress.err .progress-text { color: var(--red); }
+    .progress.err .progress-fill { background: var(--red); }
+    @media (max-width: 800px) {
+      .grid, .file-head, .key-grid, .slot-row { grid-template-columns: 1fr; }
+      main { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jjukfund 보고서 온라인 업로더</h1>
+    <span>로컬 파이썬은 산출하지 않음 · 계산은 Google Sheets Apps Script</span>
+  </header>
+
+  <main>
+    <section>
+      <h2>설정</h2>
+      <div class="grid">
+        <label>업무보고서 문서 ID
+          <input id="workId" autocomplete="off">
+        </label>
+        <label>상시보고서 문서 ID
+          <input id="watchId" autocomplete="off">
+        </label>
+        <label>서비스 계정 JSON 경로
+          <input id="jsonPath" autocomplete="off">
+        </label>
+        <label>Apps Script OAuth JSON 경로
+          <input id="oauthJsonPath" autocomplete="off">
+        </label>
+        <label>기준년
+          <input id="year" type="number" min="2000" max="2100">
+        </label>
+        <label>기준월
+          <input id="month" type="number" min="1" max="12">
+        </label>
+      </div>
+      <div class="key-grid">
+        <div class="key-card">
+          <label>서비스 계정 JSON 파일
+            <input id="serviceJsonFile" type="file" accept="application/json,.json">
+          </label>
+          <button id="uploadServiceKey">서비스 계정 JSON 업로드</button>
+        </div>
+        <div class="key-card">
+          <label>Apps Script OAuth JSON 파일
+            <input id="oauthJsonFile" type="file" accept="application/json,.json">
+          </label>
+          <button id="uploadOAuthKey">OAuth JSON 업로드</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="saveSettings">설정 저장</button>
+        <button id="oauthLogin">Google OAuth 인증</button>
+        <button class="success" id="setupSheets">구글 문서 탭 초기화</button>
+        <span class="muted" id="oauthStatus">OAuth 상태 확인 중</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>온라인 계산 스크립트</h2>
+      <div class="muted">
+        아래 코드는 구글 스프레드시트의 Apps Script 프로젝트 안에서만 산출합니다.
+        `Apps Script 직접 설치 시도`로 문서에 설치하고, 구글시트의 `실행` 탭 또는 `Jjukfund` 메뉴에서 실행하세요.
+      </div>
+      <div class="actions">
+        <button id="loadScript">스크립트 불러오기</button>
+        <button id="copyScript">클립보드 복사</button>
+        <button class="primary" id="installScript">Apps Script 직접 설치 시도</button>
+      </div>
+      <textarea id="scriptBox" spellcheck="false"></textarea>
+    </section>
+
+    <section>
+      <h2>백데이터 업로드</h2>
+      <div class="target-row upload-password-row">
+        <strong>엑셀 기본 비밀번호</strong>
+        <input id="excelPassword" type="password" autocomplete="off">
+        <span class="muted">입력된 비밀번호로 먼저 열고, 실패하면 다시 묻습니다.</span>
+      </div>
+      <div class="target-row">
+        <strong>업로드 대상</strong>
+        <label class="target-option">
+          <input type="radio" name="uploadTarget" value="work" checked>
+          업무보고서
+        </label>
+        <label class="target-option">
+          <input type="radio" name="uploadTarget" value="watch">
+          상시감시보고서
+        </label>
+      </div>
+      <div class="slot-list" id="slotList"></div>
+      <div class="drop" id="dropZone">
+        <strong>한번에 업로드하기</strong>
+        여러 파일을 여기에 드래그 앤 드롭하거나 클릭해서 추가
+        <input id="fileInput" type="file" multiple accept=".xlsx,.xls,.csv" hidden>
+      </div>
+      <div class="assign-panel" id="assignPanel" hidden>
+        <div class="assign-head">
+          <div>
+            <div class="muted" id="assignCounter">파일 배정</div>
+            <div class="assign-file" id="assignFileName"></div>
+          </div>
+          <button data-role="assign-cancel">배정 취소</button>
+        </div>
+        <div class="assign-buttons" id="assignButtons"></div>
+      </div>
+      <div class="actions">
+        <button id="selectAll">전체 체크</button>
+        <button id="selectDefaults">기본 체크 복원</button>
+        <button id="clearFiles">목록 비우기</button>
+        <button class="primary" id="uploadData">선택 컬럼 원천 탭에 업로드</button>
+        <button class="success" id="exportExcel">엑셀로 생성하기</button>
+        <button class="danger" id="clearWorkSource">업무 원천데이터 비우기</button>
+        <button class="danger" id="clearWatchSource">상시 원천데이터 비우기</button>
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </section>
+
+    <section>
+      <h2>상태</h2>
+      <div class="status" id="status">대기 중</div>
+      <div class="progress" id="progressBox">
+        <div class="progress-text" id="progressText">대기 중</div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = { settings: null, files: [], sourceOptions: [], assignmentQueue: [], assignmentIndex: 0, assigning: false, autoAssignQueued: false, listSelections: {}, progressClearTimer: null };
+    const $ = id => document.getElementById(id);
+    const pad2 = value => String(value).padStart(2, '0');
+
+    function periodKey(period) {
+      return `${period.year}-${pad2(period.month)}`;
+    }
+
+    function periodLabel(period) {
+      return `${period.year}/${period.month}`;
+    }
+
+    function addMonths(year, month, delta) {
+      const date = new Date(year, month - 1 + delta, 1);
+      return { year: date.getFullYear(), month: date.getMonth() + 1 };
+    }
+
+    function periodRange(start, end) {
+      const periods = [];
+      let cursor = { ...start };
+      while (cursor.year < end.year || (cursor.year === end.year && cursor.month <= end.month)) {
+        periods.push({ ...cursor });
+        cursor = addMonths(cursor.year, cursor.month, 1);
+      }
+      return periods;
+    }
+
+    function currentPeriod() {
+      const now = new Date();
+      const year = Number($('year').value || now.getFullYear());
+      const month = Math.max(1, Math.min(12, Number($('month').value || now.getMonth() + 1)));
+      return { year, month };
+    }
+
+    function watchContractPeriods() {
+      const { year, month } = currentPeriod();
+      return periodRange({ year, month: 1 }, { year, month });
+    }
+
+    function watchInvestorPeriods() {
+      const { year, month } = currentPeriod();
+      return periodRange(addMonths(year, month, -13), { year, month });
+    }
+
+    function singleSlot(sourceKey, label) {
+      return { type: 'single', slotKey: sourceKey, sourceKey, label };
+    }
+
+    function listGroupSlot(groupKey, sourceKey, label, periods, note) {
+      return { type: 'listGroup', groupKey, slotKey: groupKey, sourceKey, label, periods, note };
+    }
+
+    function uploadSlotGroups() {
+      if (currentUploadTarget() === 'watch') {
+        const contractPeriods = watchContractPeriods();
+        const investorPeriods = watchInvestorPeriods();
+        return [
+          listGroupSlot('watch_contract_snapshots', 'contract_snapshot_current', '기준일명세서', contractPeriods, `${periodLabel(contractPeriods[0])} ~ ${periodLabel(contractPeriods[contractPeriods.length - 1])}`),
+          listGroupSlot('watch_investors', 'investor_snapshot', '기준일투자자명세', investorPeriods, `${periodLabel(investorPeriods[0])} ~ ${periodLabel(investorPeriods[investorPeriods.length - 1])}`),
+          singleSlot('contract_all', '금월 계약명세'),
+        ];
+      }
+      return [
+        singleSlot('contract_snapshot_prev', '전월 기준일계약명세'),
+        singleSlot('contract_snapshot_current', '금월 기준일계약명세'),
+        singleSlot('investor_snapshot', '금월 기준일투자자명세'),
+        singleSlot('contract_all', '금월 계약명세'),
+      ];
+    }
+
+    function flattenedUploadSlots() {
+      return uploadSlotGroups().flatMap(group => {
+        if (group.type !== 'listGroup') return [group];
+        return [{
+          type: 'listGroup',
+          groupKey: group.groupKey,
+          slotKey: group.groupKey,
+          sourceKey: group.sourceKey,
+          label: `${group.label} 목록에 추가`,
+          groupLabel: group.label,
+          periods: group.periods,
+        }];
+      });
+    }
+
+    function uploadSlotByKey(slotKey) {
+      return flattenedUploadSlots().find(slot => slot.slotKey === slotKey) || null;
+    }
+
+    function setStatus(message, kind = '') {
+      const el = $('status');
+      el.textContent = message;
+      el.className = 'status' + (kind ? ' ' + kind : '');
+    }
+
+    function setProgress(message, percent = 0, kind = '') {
+      if (state.progressClearTimer) {
+        window.clearTimeout(state.progressClearTimer);
+        state.progressClearTimer = null;
+      }
+      const box = $('progressBox');
+      box.classList.remove('ok', 'err');
+      if (kind) box.classList.add(kind);
+      box.classList.add('show');
+      $('progressText').textContent = message;
+      $('progressFill').style.width = `${Math.max(0, Math.min(100, percent))}%`;
+    }
+
+    function finishProgress(message, kind = 'ok', delay = 4500) {
+      setProgress(message, 100, kind);
+      clearProgress(delay);
+    }
+
+    function clearProgress(delay = 800) {
+      if (state.progressClearTimer) window.clearTimeout(state.progressClearTimer);
+      state.progressClearTimer = window.setTimeout(() => {
+        $('progressBox').classList.remove('show', 'ok', 'err');
+        $('progressText').textContent = '대기 중';
+        $('progressFill').style.width = '0';
+        state.progressClearTimer = null;
+      }, delay);
+    }
+
+    function sourceSpec(sourceKey) {
+      return state.sourceOptions.find(option => option.key === sourceKey) || null;
+    }
+
+    function sourceLabel(sourceKey) {
+      const spec = sourceSpec(sourceKey);
+      return spec ? spec.userName : sourceKey;
+    }
+
+    function currentUploadTarget() {
+      const selected = document.querySelector('input[name="uploadTarget"]:checked');
+      return selected ? selected.value : 'work';
+    }
+
+    function currentUploadSlotKeys() {
+      const single = new Set();
+      const groups = new Set();
+      uploadSlotGroups().forEach(slot => {
+        if (slot.type === 'listGroup') groups.add(slot.groupKey);
+        else single.add(slot.slotKey);
+      });
+      return { single, groups };
+    }
+
+    function fileBelongsToCurrentTarget(file) {
+      const slots = currentUploadSlotKeys();
+      if (file.groupKey) return slots.groups.has(file.groupKey);
+      return slots.single.has(file.slotKey || file.sourceKey || '');
+    }
+
+    function currentTargetFileEntries() {
+      return state.files
+        .map((file, index) => ({ file, index }))
+        .filter(({ file }) => fileBelongsToCurrentTarget(file));
+    }
+
+    function currentTargetFiles() {
+      return currentTargetFileEntries().map(({ file }) => file);
+    }
+
+    function targetColumns(spec, key) {
+      if (!spec) return [];
+      const target = currentUploadTarget();
+      const byTarget = spec[`${key}ByTarget`] || {};
+      return byTarget[target] || spec[key] || [];
+    }
+
+    function applyDefaultColumnChecks(file, sourceKey) {
+      const spec = sourceSpec(sourceKey);
+      if (!spec) return;
+      const defaults = new Set(targetColumns(spec, 'defaultColumns'));
+      const required = new Set(targetColumns(spec, 'requiredColumns'));
+      file.columns.forEach(column => {
+        const shouldCheck = defaults.has(column.name) || required.has(column.name);
+        column.checked = shouldCheck;
+        column.defaultChecked = shouldCheck;
+      });
+    }
+
+    function missingColumnsForFile(file, sourceKey) {
+      const spec = sourceSpec(sourceKey);
+      if (!spec) return [];
+      const available = new Set(file.columns.map(column => column.name));
+      const generated = new Set(spec.generatedColumns || []);
+      return targetColumns(spec, 'requiredColumns').filter(column => !generated.has(column) && !available.has(column));
+    }
+
+    function confirmMissingColumns(file, sourceKey) {
+      const missing = file.missingRequiredColumns || missingColumnsForFile(file, sourceKey);
+      file.missingRequiredColumns = missing;
+      if (!missing.length) {
+        file.allowMissingColumns = false;
+        return true;
+      }
+      const spec = sourceSpec(sourceKey);
+      const label = spec ? spec.userName : sourceKey;
+      const ok = window.confirm(
+        `${label} 슬롯에 넣은 파일에서 필요한 컬럼 일부를 찾지 못했습니다.\n\n` +
+        `파일: ${file.originalName}\n` +
+        `없는 컬럼: ${missing.join(', ')}\n\n` +
+        '이 파일을 이 슬롯에 사용하는 것이 맞으면 확인을 누르세요. 확인하면 찾을 수 있는 기본 컬럼만 체크해서 목록에 표시합니다.'
+      );
+      file.allowMissingColumns = ok;
+      return ok;
+    }
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, options);
+      const data = await res.json();
+      if (!res.ok || data.ok === false) throw new Error(data.error || '요청 실패');
+      return data;
+    }
+
+    async function loadSettings() {
+      const data = await api('/api/settings');
+      state.settings = data;
+      state.sourceOptions = data.source_options || [];
+      $('workId').value = data.work_report_spreadsheet_id || '';
+      $('watchId').value = data.watch_report_spreadsheet_id || '';
+      $('jsonPath').value = data.service_account_json || '';
+      $('oauthJsonPath').value = data.apps_script_oauth_json || '';
+      $('year').value = data.default_year || '';
+      $('month').value = data.default_month || '';
+      $('excelPassword').value = data.default_excel_password || '118050';
+      renderSlotList();
+    }
+
+    function currentSettings() {
+      normalizeSpreadsheetIdInputs();
+      return {
+        work_report_spreadsheet_id: $('workId').value.trim(),
+        watch_report_spreadsheet_id: $('watchId').value.trim(),
+        service_account_json: $('jsonPath').value.trim(),
+        apps_script_oauth_json: $('oauthJsonPath').value.trim(),
+        default_year: Number($('year').value || 0),
+        default_month: Number($('month').value || 0),
+        default_excel_password: $('excelPassword').value,
+      };
+    }
+
+    function extractSpreadsheetId(value) {
+      let text = String(value || '').trim();
+      if (!text) return '';
+      const markdown = text.match(/\((https?:\/\/[^)]+)\)/);
+      if (markdown) text = markdown[1].trim();
+      const patterns = [
+        /\/spreadsheets\/d\/([A-Za-z0-9_-]+)/,
+        /\/d\/([A-Za-z0-9_-]+)/,
+        /[?&]id=([A-Za-z0-9_-]+)/,
+        /[?&]key=([A-Za-z0-9_-]+)/,
+      ];
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) return match[1];
+      }
+      text = text.split('#')[0].split('?')[0].trim().replace(/\/+$/, '');
+      return /^[A-Za-z0-9_-]{20,}$/.test(text) ? text : String(value || '').trim();
+    }
+
+    function normalizeSpreadsheetIdInputs() {
+      ['workId', 'watchId'].forEach(id => {
+        const input = $(id);
+        input.value = extractSpreadsheetId(input.value);
+      });
+    }
+
+    async function saveSettings(options = {}) {
+      await api('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentSettings()),
+      });
+      if (!options.silent) setStatus('설정을 저장했습니다.', 'ok');
+    }
+
+    async function uploadServiceKey() {
+      const file = $('serviceJsonFile').files[0];
+      if (!file) throw new Error('업로드할 서비스 계정 JSON을 선택해주세요.');
+      const form = new FormData();
+      form.append('file', file);
+      const data = await api('/api/key', { method: 'POST', body: form });
+      $('jsonPath').value = data.path;
+      setStatus(`서비스 계정 JSON을 교체했습니다.\n서비스 계정: ${data.client_email}`, 'ok');
+    }
+
+    async function uploadOAuthKey() {
+      const file = $('oauthJsonFile').files[0];
+      if (!file) throw new Error('업로드할 Apps Script OAuth JSON을 선택해주세요.');
+      const form = new FormData();
+      form.append('file', file);
+      const data = await api('/api/oauth-key', { method: 'POST', body: form });
+      $('oauthJsonPath').value = data.path;
+      await refreshOAuthStatus(true);
+      setStatus(`Apps Script OAuth JSON을 교체했습니다.\n클라이언트 ID: ${data.client_id}`, 'ok');
+    }
+
+    async function setupSheets() {
+      setProgress('설정 저장 중...', 10);
+      await saveSettings({ silent: true });
+      setProgress('구글 문서 접근 및 탭 초기화 중...', 45);
+      const data = await api('/api/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentSettings()),
+      });
+      setProgress('초기화 결과 정리 중...', 90);
+      setStatus('구글 문서 탭 초기화를 완료했습니다.\n' + JSON.stringify(data.result, null, 2), 'ok');
+      setProgress('구글 문서 탭 초기화 완료', 100);
+      clearProgress();
+    }
+
+    async function refreshOAuthStatus(silent = false) {
+      const data = await api('/api/oauth/status');
+      if (data.clientJson) $('oauthJsonPath').value = data.clientJson;
+      $('oauthStatus').textContent = data.valid
+        ? 'OAuth 인증 완료'
+        : (data.hasClient ? 'OAuth 인증 필요' : 'OAuth JSON 없음');
+      if (!silent && data.error) setStatus(data.error, data.valid ? 'ok' : 'err');
+      return data;
+    }
+
+    async function startOAuth() {
+      setProgress('OAuth 설정 저장 중...', 10);
+      await saveSettings({ silent: true });
+      setProgress('Google 인증 주소 생성 중...', 45);
+      const data = await api('/api/oauth/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentSettings()),
+      });
+      $('oauthJsonPath').value = data.clientJson;
+      const popup = window.open(data.authUrl, 'jjukfundGoogleOAuth', 'width=720,height=760');
+      if (!popup) window.location.href = data.authUrl;
+      setProgress('Google 인증 창 대기 중...', 80);
+      setStatus('Google 인증 창을 열었습니다. 권한 승인 후 이 화면으로 돌아와 Apps Script 직접 설치를 다시 누르세요.', 'ok');
+
+      let attempts = 0;
+      const timer = window.setInterval(async () => {
+        attempts += 1;
+        try {
+          const status = await refreshOAuthStatus(true);
+          if (status.valid || attempts >= 60) window.clearInterval(timer);
+          if (status.valid) {
+            setStatus('Google OAuth 인증이 완료되었습니다. 이제 Apps Script 직접 설치를 누르세요.', 'ok');
+            finishProgress('Google OAuth 인증 완료', 'ok');
+          } else if (attempts >= 60) {
+            setStatus('Google 인증 완료를 확인하지 못했습니다. 인증을 마쳤다면 OAuth 상태 새로고침 또는 Apps Script 직접 설치를 다시 눌러주세요.', 'err');
+            finishProgress('Google 인증 확인 시간이 초과되었습니다.', 'err', 6000);
+          }
+        } catch (_) {
+          if (attempts >= 60) {
+            window.clearInterval(timer);
+            finishProgress('Google 인증 상태 확인에 실패했습니다.', 'err', 6000);
+          }
+        }
+      }, 2000);
+    }
+
+    async function loadScript() {
+      const data = await api(`/api/apps-script?target=${encodeURIComponent(currentUploadTarget())}`);
+      $('scriptBox').value = data.code;
+      setStatus(`${data.target === 'watch' ? '상시감시보고서' : '업무보고서'} Apps Script 코드를 불러왔습니다.`, 'ok');
+    }
+
+    async function copyScript() {
+      if (!$('scriptBox').value) await loadScript();
+      await navigator.clipboard.writeText($('scriptBox').value);
+      setStatus('Apps Script 코드를 클립보드에 복사했습니다.', 'ok');
+    }
+
+    async function installScript() {
+      setProgress('설정 저장 중...', 8);
+      await saveSettings({ silent: true });
+      setProgress('Google OAuth 권한 확인 중...', 25);
+      const oauth = await refreshOAuthStatus(true);
+      if (!oauth.valid) {
+        await startOAuth();
+        throw new Error('Google OAuth 인증이 먼저 필요합니다. 인증 완료 후 다시 설치를 눌러주세요.');
+      }
+      setProgress('업무/상시 Apps Script 프로젝트 접근 중...', 45);
+      const res = await fetch('/api/install-script', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentSettings()),
+      });
+      setProgress('업무용/상시용 Apps Script 코드 분리 삽입 중...', 75);
+      const data = await res.json();
+      if (!res.ok || data.ok === false) {
+        if (data.oauthRequired) await startOAuth();
+        throw new Error(data.error || 'Apps Script 직접 설치 실패');
+      }
+      setStatus('Apps Script 직접 설치를 완료했습니다.\n' + JSON.stringify(data.installed, null, 2), 'ok');
+      setProgress('Apps Script 직접 설치 완료', 100);
+      clearProgress();
+    }
+
+    async function parseFiles(files, forcedSourceKey = '', options = {}) {
+      const selectedFiles = Array.from(files || []);
+      if (!selectedFiles.length) return;
+      const parsedFiles = [];
+      const slot = options.slot || (options.slotKey ? uploadSlotByKey(options.slotKey) : null);
+      for (const file of selectedFiles) {
+        setStatus(`${file.name} 파싱 중...`);
+        const data = await parseOneFile(file, defaultExcelPassword(), forcedSourceKey);
+        data.sourceLocked = Boolean(forcedSourceKey);
+        data.groupKey = slot && slot.type === 'listGroup' ? slot.groupKey : '';
+        data.slotKey = data.groupKey ? `${slot.groupKey}:${data.token}` : (slot ? slot.slotKey : (forcedSourceKey || data.sourceKey || ''));
+        data.slotLabel = slot ? slot.label : '';
+        data.periodYear = slot && slot.period ? slot.period.year : null;
+        data.periodMonth = slot && slot.period ? slot.period.month : null;
+        data.periodLabel = slot && slot.period ? periodLabel(slot.period) : '';
+        if (forcedSourceKey) {
+          data.sourceKey = forcedSourceKey;
+          applyDefaultColumnChecks(data, forcedSourceKey);
+          if (!confirmMissingColumns(data, forcedSourceKey)) continue;
+        } else {
+          data.sourceKey = data.sourceKey || '';
+          data.allowMissingColumns = false;
+        }
+        parsedFiles.push(data);
+      }
+      if (!parsedFiles.length) {
+        setStatus('파일 추가가 취소되었습니다.');
+        return 0;
+      }
+      if (slot && options.replaceSlot) {
+        state.files = state.files.filter(file => file.slotKey !== slot.slotKey);
+      } else if (forcedSourceKey && options.replaceSource) {
+        state.files = state.files.filter(file => file.sourceKey !== forcedSourceKey);
+      }
+      state.files.push(...parsedFiles);
+      refreshListGroupPeriods();
+      renderFiles();
+      renderAssignmentPrompt();
+      setStatus('파일 파싱 완료. 컬럼 체크 후 업로드하세요.', 'ok');
+      return parsedFiles.length;
+    }
+
+    function startBulkAssignment(files) {
+      const selectedFiles = Array.from(files || []);
+      if (!selectedFiles.length) return;
+      state.assignmentQueue = selectedFiles;
+      state.assignmentIndex = 0;
+      state.assigning = false;
+      renderAssignmentPrompt();
+      setStatus(`${selectedFiles.length}개 파일을 백데이터 슬롯에 배정하세요.`);
+    }
+
+    function currentAssignmentFile() {
+      return state.assignmentQueue[state.assignmentIndex] || null;
+    }
+
+    function assignedSingleSlotKeys() {
+      return new Set(state.files.filter(file => !file.groupKey).map(file => file.slotKey || file.sourceKey).filter(Boolean));
+    }
+
+    function availableAssignmentSlots() {
+      const assigned = assignedSingleSlotKeys();
+      return flattenedUploadSlots().filter(slot => slot.type === 'listGroup' || !assigned.has(slot.slotKey));
+    }
+
+    function renderAssignmentPrompt() {
+      const panel = $('assignPanel');
+      const file = currentAssignmentFile();
+      panel.hidden = !file;
+      if (!file) return;
+      $('assignCounter').textContent = `${state.assignmentIndex + 1} / ${state.assignmentQueue.length} 파일 배정`;
+      $('assignFileName').textContent = file.name;
+      const assigned = assignedSingleSlotKeys();
+      const buttons = $('assignButtons');
+      buttons.innerHTML = flattenedUploadSlots().map(slot => {
+        const alreadyAssigned = slot.type !== 'listGroup' && assigned.has(slot.slotKey);
+        return `<button data-role="assign-slot" data-slot-key="${escapeHtml(slot.slotKey)}" ${state.assigning || alreadyAssigned ? 'disabled' : ''} title="${alreadyAssigned ? '이미 배정된 슬롯입니다. 위 슬롯의 제거를 누르면 다시 선택할 수 있습니다.' : ''}">${escapeHtml(slot.label)}</button>`;
+      }).join('') + '<button data-role="assign-skip">이 파일 건너뛰기</button>';
+      panel.querySelectorAll('[data-role="assign-skip"], [data-role="assign-cancel"]').forEach(button => {
+        button.disabled = state.assigning;
+      });
+      maybeAutoAssignLastSource();
+    }
+
+    function maybeAutoAssignLastSource() {
+      const file = currentAssignmentFile();
+      if (!file || state.assigning || state.autoAssignQueued) return;
+      const available = availableAssignmentSlots();
+      if (available.length === 0) {
+        setStatus('배정 가능한 빈 슬롯이 없습니다. 위 슬롯의 제거를 눌러 비운 뒤 다시 선택하세요.', 'err');
+        return;
+      }
+      if (available.length !== 1) return;
+      const slot = available[0];
+      state.autoAssignQueued = true;
+      setStatus(`${file.name}은 남은 슬롯 ${slot.label}에 자동 배정합니다.`, 'ok');
+      window.setTimeout(() => {
+        state.autoAssignQueued = false;
+        if (!currentAssignmentFile() || state.assigning) return;
+        if (!availableAssignmentSlots().some(item => item.slotKey === slot.slotKey)) return;
+        assignCurrentFile(slot.slotKey).catch(err => {
+          setStatus(err.message, 'err');
+          clearProgress(0);
+          state.assigning = false;
+          renderAssignmentPrompt();
+        });
+      }, 250);
+    }
+
+    async function assignCurrentFile(slotKey) {
+      const file = currentAssignmentFile();
+      if (!file || state.assigning) return;
+      const slot = uploadSlotByKey(slotKey);
+      if (!slot) {
+        setStatus('선택한 슬롯을 찾지 못했습니다. 기준년월과 업로드 대상을 확인해주세요.', 'err');
+        return;
+      }
+      if (slot.type !== 'listGroup' && assignedSingleSlotKeys().has(slot.slotKey)) {
+        setStatus(`${slot.label} 슬롯은 이미 배정되어 있습니다. 제거 후 다시 선택하세요.`, 'err');
+        return;
+      }
+      state.assigning = true;
+      renderAssignmentPrompt();
+      setProgress(`${file.name} → ${slot.label} 파싱 중...`, 20);
+      try {
+        const added = await parseFiles([file], slot.sourceKey, { replaceSlot: true, slot });
+        if (!added) {
+          clearProgress(0);
+          return;
+        }
+        state.assignmentIndex += 1;
+        if (state.assignmentIndex >= state.assignmentQueue.length) {
+          state.assignmentQueue = [];
+          state.assignmentIndex = 0;
+          setProgress('파일 배정 완료', 100);
+          setStatus('한번에 업로드하기 파일 배정을 완료했습니다. 컬럼 체크 후 업로드하세요.', 'ok');
+          clearProgress();
+        } else {
+          setProgress('다음 파일 대기 중...', 5);
+        }
+      } finally {
+        state.assigning = false;
+        renderAssignmentPrompt();
+      }
+    }
+
+    function skipCurrentAssignmentFile() {
+      if (state.assigning || !currentAssignmentFile()) return;
+      state.assignmentIndex += 1;
+      if (state.assignmentIndex >= state.assignmentQueue.length) {
+        state.assignmentQueue = [];
+        state.assignmentIndex = 0;
+        setStatus('파일 배정을 마쳤습니다.', 'ok');
+      }
+      renderAssignmentPrompt();
+    }
+
+    function cancelBulkAssignment() {
+      if (state.assigning) return;
+      state.assignmentQueue = [];
+      state.assignmentIndex = 0;
+      state.autoAssignQueued = false;
+      renderAssignmentPrompt();
+      setStatus('파일 배정을 취소했습니다.');
+    }
+
+    function clearSlot(slotKey) {
+      const before = state.files.length;
+      state.files = state.files.filter(file => (file.slotKey || file.sourceKey) !== slotKey);
+      refreshListGroupPeriods();
+      renderFiles();
+      renderAssignmentPrompt();
+      const slot = uploadSlotByKey(slotKey);
+      setStatus(before === state.files.length ? '비울 파일이 없습니다.' : `${slot ? slot.label : slotKey} 슬롯을 비웠습니다.`, 'ok');
+    }
+
+    function refreshListGroupPeriods() {
+      uploadSlotGroups()
+        .filter(group => group.type === 'listGroup')
+        .forEach(group => {
+          const files = state.files.filter(file => file.groupKey === group.groupKey);
+          files.forEach((file, index) => {
+            const period = group.periods[index] || null;
+            file.periodYear = period ? period.year : null;
+            file.periodMonth = period ? period.month : null;
+            file.periodLabel = period ? periodLabel(period) : '범위 초과';
+            file.periodOutOfRange = !period;
+            file.slotLabel = group.label;
+          });
+        });
+    }
+
+    function clearListGroup(groupKey) {
+      const before = state.files.length;
+      state.files = state.files.filter(file => file.groupKey !== groupKey);
+      setGroupSelection(groupKey, []);
+      refreshListGroupPeriods();
+      renderFiles();
+      renderAssignmentPrompt();
+      setStatus(before === state.files.length ? '비울 파일이 없습니다.' : '목록을 비웠습니다.', 'ok');
+    }
+
+    function sortListGroup(groupKey, direction) {
+      const sorted = state.files
+        .filter(file => file.groupKey === groupKey)
+        .slice()
+        .sort((a, b) => direction === 'desc'
+          ? b.originalName.localeCompare(a.originalName, 'ko', { numeric: true })
+          : a.originalName.localeCompare(b.originalName, 'ko', { numeric: true }));
+      let cursor = 0;
+      state.files = state.files.map(file => file.groupKey === groupKey ? sorted[cursor++] : file);
+      setGroupSelection(groupKey, []);
+      refreshListGroupPeriods();
+      renderFiles();
+      renderAssignmentPrompt();
+    }
+
+    async function parseOneFile(file, password = '', sourceKey = '') {
+      const form = new FormData();
+      form.append('file', file);
+      if (password) form.append('password', password);
+      if (sourceKey) form.append('sourceKey', sourceKey);
+      form.append('reportTarget', currentUploadTarget());
+      const res = await fetch('/api/parse', { method: 'POST', body: form });
+      const data = await res.json();
+      if (res.ok && data.ok !== false) return data;
+      if (data.needPassword) {
+        const input = window.prompt(`${file.name} 파일 비밀번호를 입력해주세요.`, $('excelPassword').value || '118050');
+        if (!input) throw new Error('비밀번호 입력이 취소되었습니다.');
+        $('excelPassword').value = input;
+        return parseOneFile(file, input, sourceKey);
+      }
+      throw new Error(data.error || '파일 파싱 실패');
+    }
+
+    function defaultExcelPassword() {
+      return $('excelPassword').value || '';
+    }
+
+    function renderFiles() {
+      refreshListGroupPeriods();
+      renderSlotList();
+      const root = $('fileList');
+      root.innerHTML = '';
+      const groups = fileDisplayGroups();
+      groups.forEach(group => {
+        if (group.type === 'listGroup') {
+          root.appendChild(periodFileGroupCard(group));
+          return;
+        }
+        const { file, index } = group;
+        const card = document.createElement('div');
+        card.className = 'file-card';
+        const options = [
+          `<option value="" ${file.sourceKey ? '' : 'selected'}>파일 유형 선택</option>`,
+          ...state.sourceOptions.map(opt => {
+          const selected = file.sourceKey === opt.key ? 'selected' : '';
+          return `<option value="${opt.key}" ${selected}>${opt.userName} → ${opt.sheetName}</option>`;
+          }),
+        ].join('');
+        const checkedCount = file.columns.filter(c => c.checked).length;
+        const spec = sourceSpec(file.sourceKey);
+        const required = new Set(targetColumns(spec, 'requiredColumns'));
+        const missing = file.missingRequiredColumns || [];
+        const missingNote = missing.length
+          ? `<div class="muted">없는 컬럼 ${missing.length}개: ${escapeHtml(missing.join(', '))}${file.allowMissingColumns ? ' · 사용자 확인됨' : ''}</div>`
+          : '';
+        card.innerHTML = `
+          <div class="file-head">
+            <div>
+              <div class="file-title">${escapeHtml(file.originalName)} <span class="pill">${file.rowCount.toLocaleString()}행</span></div>
+              <div class="muted">체크된 컬럼 ${checkedCount}개 / 전체 ${file.columns.length}개</div>
+              ${missingNote}
+            </div>
+            <select data-role="source" data-index="${index}" ${file.sourceLocked ? 'disabled' : ''}>${options}</select>
+            <button data-role="remove" data-index="${index}">제거</button>
+          </div>
+          <div class="columns">
+            ${file.columns.map((col, colIndex) => `
+              <label>
+                <input type="checkbox" data-role="column" data-index="${index}" data-col="${colIndex}" ${col.checked ? 'checked' : ''} ${required.has(col.name) ? 'disabled' : ''}>
+                <span>${escapeHtml(col.name)}${required.has(col.name) ? ' <span class="pill">필수</span>' : ''}</span>
+              </label>
+            `).join('')}
+          </div>
+          <details>
+            <summary>미리보기</summary>
+            <div class="preview">${previewTable(file)}</div>
+          </details>
+        `;
+        root.appendChild(card);
+      });
+    }
+
+    function fileDisplayGroups() {
+      if (currentUploadTarget() !== 'watch') {
+        return currentTargetFileEntries().map(({ file, index }) => ({ type: 'single', file, index }));
+      }
+      const groups = [];
+      const periodGroups = new Map();
+      currentTargetFileEntries().forEach(({ file, index }) => {
+        const grouped = Boolean(file.groupKey);
+        if (!grouped) {
+          groups.push({ type: 'single', file, index });
+          return;
+        }
+        const key = file.groupKey;
+        if (!periodGroups.has(key)) {
+          const slot = uploadSlotGroups().find(item => item.groupKey === file.groupKey);
+          periodGroups.set(key, {
+            type: 'listGroup',
+            key,
+            sourceKey: file.sourceKey,
+            label: slot ? slot.label : (file.sourceKey === 'investor_snapshot' ? '기준일투자자명세' : '기준일명세서'),
+            files: [],
+          });
+          groups.push(periodGroups.get(key));
+        }
+        periodGroups.get(key).files.push({ file, index });
+      });
+      return groups;
+    }
+
+    function periodFileGroupCard(group) {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+      const spec = sourceSpec(group.sourceKey);
+      const required = new Set(targetColumns(spec, 'requiredColumns'));
+      const columns = groupColumns(group.files.map(item => item.file));
+      const checkedCount = columns.filter(name => group.files.some(({ file }) => {
+        const col = file.columns.find(item => item.name === name);
+        return col && col.checked;
+      })).length;
+      const missing = Array.from(new Set(group.files.flatMap(({ file }) => file.missingRequiredColumns || [])));
+      const missingNote = missing.length
+        ? `<div class="muted">없는 컬럼 ${missing.length}개: ${escapeHtml(missing.join(', '))}</div>`
+        : '';
+      const fileBadges = group.files
+        .sort((a, b) => (a.file.periodYear - b.file.periodYear) || (a.file.periodMonth - b.file.periodMonth))
+        .map(({ file }) => `<span class="pill">${escapeHtml(file.periodLabel || '')} · ${escapeHtml(file.originalName)}</span>`)
+        .join('');
+      card.innerHTML = `
+        <div class="file-head">
+          <div>
+            <div class="file-title">${escapeHtml(group.label)} <span class="pill">${group.files.length}개 월</span></div>
+            <div class="muted">체크된 컬럼 ${checkedCount}개 / 전체 ${columns.length}개 · 이 체크 상태가 묶음 안 월별 파일에 일괄 적용됩니다.</div>
+            <div class="group-file-list">${fileBadges}</div>
+            ${missingNote}
+          </div>
+          <div class="muted">${escapeHtml(spec ? spec.sheetName : group.sourceKey)}</div>
+          <button data-role="remove-group" data-group-key="${escapeHtml(group.key)}">묶음 제거</button>
+        </div>
+        <div class="columns">
+          ${columns.map(name => {
+            const isRequired = required.has(name);
+            const checked = group.files.some(({ file }) => {
+              const col = file.columns.find(item => item.name === name);
+              return col && col.checked;
+            });
+            return `
+              <label>
+                <input type="checkbox" data-role="group-column" data-group-key="${escapeHtml(group.key)}" data-col-name="${escapeHtml(name)}" ${checked ? 'checked' : ''} ${isRequired ? 'disabled' : ''}>
+                <span>${escapeHtml(name)}${isRequired ? ' <span class="pill">필수</span>' : ''}</span>
+              </label>
+            `;
+          }).join('')}
+        </div>
+        <details>
+          <summary>첫 파일 미리보기</summary>
+          <div class="preview">${previewTable(group.files[0].file)}</div>
+        </details>
+      `;
+      return card;
+    }
+
+    function groupColumns(files) {
+      const seen = new Set();
+      const columns = [];
+      files.forEach(file => {
+        file.columns.forEach(column => {
+          if (!seen.has(column.name)) {
+            seen.add(column.name);
+            columns.push(column.name);
+          }
+        });
+      });
+      return columns;
+    }
+
+    function filesInGroup(groupKey) {
+      return state.files.filter(file => file.groupKey === groupKey);
+    }
+
+    function selectedGroupIndexes(groupKey) {
+      const select = document.querySelector(`select[data-role="group-listbox"][data-group-key="${cssEscape(groupKey)}"]`);
+      if (!select) return state.listSelections[groupKey] || [];
+      return Array.from(select.selectedOptions)
+        .map(option => Number(option.value))
+        .filter(index => Number.isInteger(index));
+    }
+
+    function setGroupSelection(groupKey, indexes) {
+      state.listSelections[groupKey] = Array.from(new Set(indexes))
+        .filter(index => Number.isInteger(index) && index >= 0)
+        .sort((a, b) => a - b);
+    }
+
+    function replaceGroupFiles(groupKey, groupedFiles) {
+      let cursor = 0;
+      const nextFiles = [];
+      state.files.forEach(file => {
+        if (file.groupKey !== groupKey) {
+          nextFiles.push(file);
+          return;
+        }
+        if (cursor < groupedFiles.length) nextFiles.push(groupedFiles[cursor++]);
+      });
+      state.files = nextFiles;
+    }
+
+    function moveSelectedGroupFiles(groupKey, delta) {
+      const grouped = filesInGroup(groupKey).slice();
+      const selected = selectedGroupIndexes(groupKey);
+      if (!selected.length) {
+        setStatus('이동할 파일을 리스트에서 선택하세요.');
+        return;
+      }
+      const selectedSet = new Set(selected);
+      if (delta < 0) {
+        selected.sort((a, b) => a - b).forEach(index => {
+          if (index <= 0 || selectedSet.has(index - 1)) return;
+          [grouped[index - 1], grouped[index]] = [grouped[index], grouped[index - 1]];
+          selectedSet.delete(index);
+          selectedSet.add(index - 1);
+        });
+      } else {
+        selected.sort((a, b) => b - a).forEach(index => {
+          if (index >= grouped.length - 1 || selectedSet.has(index + 1)) return;
+          [grouped[index], grouped[index + 1]] = [grouped[index + 1], grouped[index]];
+          selectedSet.delete(index);
+          selectedSet.add(index + 1);
+        });
+      }
+      replaceGroupFiles(groupKey, grouped);
+      setGroupSelection(groupKey, Array.from(selectedSet));
+      refreshListGroupPeriods();
+      renderFiles();
+      renderAssignmentPrompt();
+      setStatus('선택한 파일 순서를 변경했습니다.', 'ok');
+    }
+
+    function removeSelectedGroupFiles(groupKey) {
+      const selected = selectedGroupIndexes(groupKey);
+      if (!selected.length) {
+        setStatus('제거할 파일을 리스트에서 선택하세요.');
+        return;
+      }
+      const selectedSet = new Set(selected);
+      const grouped = filesInGroup(groupKey).filter((_, index) => !selectedSet.has(index));
+      replaceGroupFiles(groupKey, grouped);
+      setGroupSelection(groupKey, []);
+      refreshListGroupPeriods();
+      renderFiles();
+      renderAssignmentPrompt();
+      setStatus('선택한 파일을 제거했습니다.', 'ok');
+    }
+
+    function renderSlotList() {
+      const root = $('slotList');
+      if (!root) return;
+      root.innerHTML = uploadSlotGroups().map(group => {
+        if (group.type === 'listGroup') return renderListGroupSlot(group);
+        return renderSingleSlot(group);
+      }).join('');
+    }
+
+    function renderSingleSlot(slot) {
+      const assigned = state.files.filter(file => (file.slotKey || file.sourceKey) === slot.slotKey);
+      const names = assigned.map(file => file.originalName).join(', ');
+      return `
+        <div class="slot-row" data-drop-slot-key="${escapeHtml(slot.slotKey)}">
+          <strong>${escapeHtml(slot.label)}</strong>
+          <div class="slot-status">${names ? escapeHtml(names) : '파일 없음'}</div>
+          <button data-role="slot-add" data-slot-key="${escapeHtml(slot.slotKey)}">찾아보기</button>
+          <button data-role="slot-remove" data-slot-key="${escapeHtml(slot.slotKey)}" ${assigned.length ? '' : 'disabled'}>제거</button>
+          <input data-role="slot-input" data-slot-key="${escapeHtml(slot.slotKey)}" type="file" accept=".xlsx,.xls,.csv" hidden>
+        </div>
+      `;
+    }
+
+    function renderListGroupSlot(group) {
+      const files = state.files.filter(file => file.groupKey === group.groupKey);
+      const status = `${files.length} / ${group.periods.length}개 파일`;
+      const selected = new Set(state.listSelections[group.groupKey] || []);
+      const size = Math.min(Math.max(files.length || 4, 6), 14);
+      const options = files.length
+        ? files.map((file, index) => {
+            const label = file.periodLabel || (group.periods[index] ? periodLabel(group.periods[index]) : '범위 초과');
+            return `<option value="${index}" ${selected.has(index) ? 'selected' : ''}>${escapeHtml(label)} · ${escapeHtml(file.originalName)}</option>`;
+          }).join('')
+        : '<option disabled>파일을 여기에 드래그 앤 드롭하거나 파일 추가로 넣으세요</option>';
+      return `
+        <div class="slot-row period-group">
+          <div class="period-title">
+            <strong>${escapeHtml(group.label)}</strong>
+            <span class="muted">${escapeHtml(group.note)} · Shift/Ctrl로 여러 파일을 선택할 수 있습니다.</span>
+          </div>
+          <div>
+            <select class="ordered-list" data-role="group-listbox" data-group-key="${escapeHtml(group.groupKey)}" data-drop-list-key="${escapeHtml(group.groupKey)}" multiple size="${size}" aria-label="${escapeHtml(group.label)} 파일 순서">
+              ${options}
+            </select>
+            <div class="list-actions">
+              <button data-role="list-add" data-group-key="${escapeHtml(group.groupKey)}">파일 추가</button>
+              <button class="icon-button" data-role="list-move-selected" data-group-key="${escapeHtml(group.groupKey)}" data-delta="-1" title="선택 항목 위로 이동" aria-label="선택 항목 위로 이동" ${files.length ? '' : 'disabled'}>↑</button>
+              <button class="icon-button" data-role="list-move-selected" data-group-key="${escapeHtml(group.groupKey)}" data-delta="1" title="선택 항목 아래로 이동" aria-label="선택 항목 아래로 이동" ${files.length ? '' : 'disabled'}>↓</button>
+              <button data-role="list-remove-selected" data-group-key="${escapeHtml(group.groupKey)}" ${files.length ? '' : 'disabled'}>선택 제거</button>
+              <button data-role="list-sort" data-group-key="${escapeHtml(group.groupKey)}" data-direction="asc">오름차순</button>
+              <button data-role="list-sort" data-group-key="${escapeHtml(group.groupKey)}" data-direction="desc">내림차순</button>
+              <button data-role="list-clear" data-group-key="${escapeHtml(group.groupKey)}" ${files.length ? '' : 'disabled'}>목록 비우기</button>
+              <span class="muted">${escapeHtml(status)}</span>
+            </div>
+            <input data-role="list-input" data-group-key="${escapeHtml(group.groupKey)}" type="file" multiple accept=".xlsx,.xls,.csv" hidden>
+          </div>
+        </div>
+      `;
+    }
+
+    function previewTable(file) {
+      const headers = file.columns.map(c => c.name);
+      const rows = file.preview || [];
+      return `<table><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(v => `<td>${escapeHtml(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value === null || value === undefined ? '' : value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+
+    function cssEscape(value) {
+      if (window.CSS && CSS.escape) return CSS.escape(value);
+      return String(value).replace(/["\\]/g, '\\$&');
+    }
+
+    function validateListGroupsBeforeUpload() {
+      if (currentUploadTarget() !== 'watch') return;
+      const problems = uploadSlotGroups()
+        .filter(group => group.type === 'listGroup')
+        .map(group => {
+          const count = state.files.filter(file => file.groupKey === group.groupKey).length;
+          return count && count !== group.periods.length
+            ? `${group.label}: 필요한 파일 ${group.periods.length}개(${group.note}), 현재 ${count}개`
+            : '';
+        })
+        .filter(Boolean);
+      if (problems.length) {
+        throw new Error('월별 리스트 파일 수가 맞지 않습니다.\n' + problems.join('\n'));
+      }
+    }
+
+    async function uploadData() {
+      refreshListGroupPeriods();
+      const uploadFiles = currentTargetFiles();
+      if (!uploadFiles.length) throw new Error('현재 선택한 보고서에 업로드할 파일이 없습니다.');
+      validateListGroupsBeforeUpload();
+      setProgress('업로드 설정 준비 중...', 5);
+      const items = uploadFiles.map(file => ({
+        token: file.token,
+        sourceKey: file.sourceKey,
+        columns: file.columns.filter(c => c.checked).map(c => c.name),
+        originalName: file.originalName,
+        allowMissingColumns: Boolean(file.allowMissingColumns),
+        periodYear: file.periodYear,
+        periodMonth: file.periodMonth,
+      }));
+      const targets = [currentUploadTarget()];
+      const fileSummary = items.map(item => item.originalName).slice(0, 5).join(', ');
+      const suffix = items.length > 5 ? ` 외 ${items.length - 5}개` : '';
+      setProgress(`원천 파일 ${items.length}개 병합 후 업로드 중: ${fileSummary}${suffix}`, 35);
+      const data = await api('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: currentSettings(), items, targets, mode: 'replace' }),
+      });
+      setProgress('업로드 결과 정리 중...', 95);
+      setStatus('원천 데이터 업로드 완료.\n이제 구글시트에서 Jjukfund > 보고서 재계산을 실행하세요.\n' + JSON.stringify(data.uploaded || [], null, 2), 'ok');
+      finishProgress(`원천 데이터 업로드 완료: ${items.length}개 파일`, 'ok', 6000);
+    }
+
+    async function exportExcel() {
+      refreshListGroupPeriods();
+      const uploadFiles = currentTargetFiles();
+      if (!uploadFiles.length) throw new Error('엑셀로 생성할 파일이 없습니다.');
+      validateListGroupsBeforeUpload();
+      setProgress('로컬 엑셀 생성 준비 중...', 5);
+      const items = uploadFiles.map(file => ({
+        token: file.token,
+        sourceKey: file.sourceKey,
+        columns: file.columns.filter(c => c.checked).map(c => c.name),
+        originalName: file.originalName,
+        allowMissingColumns: Boolean(file.allowMissingColumns),
+        periodYear: file.periodYear,
+        periodMonth: file.periodMonth,
+      }));
+      const fileSummary = items.map(item => item.originalName).slice(0, 5).join(', ');
+      const suffix = items.length > 5 ? ` 외 ${items.length - 5}개` : '';
+      setProgress(`원천 파일 ${items.length}개로 엑셀 생성 중: ${fileSummary}${suffix}`, 35);
+      const data = await api('/api/export-excel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          settings: currentSettings(),
+          items,
+          target: currentUploadTarget(),
+        }),
+      });
+      const warnings = (data.warnings || []).length ? `\n주의:\n${data.warnings.join('\n')}` : '';
+      setStatus(`엑셀 파일 생성 완료: ${data.fileName}${warnings}`, 'ok');
+      finishProgress(`엑셀 파일 생성 완료: ${data.fileName}`, 'ok', 7000);
+      if (data.downloadUrl) window.open(data.downloadUrl, '_blank');
+    }
+
+    async function clearSourceData(target) {
+      const label = target === 'watch' ? '상시감시보고서' : '업무보고서';
+      const ok = window.confirm(
+        `${label}의 원천데이터를 비웁니다.\n\n` +
+        '계약명세, 기준일투자자, 기준일계약명세 탭은 헤더만 남기고 비우며,\n' +
+        '계산 보조 탭도 함께 비웁니다.\n\n' +
+        '보고서 양식 시트는 삭제하지 않습니다. 계속할까요?'
+      );
+      if (!ok) return;
+      setProgress(`${label} 설정 저장 중...`, 8);
+      await saveSettings({ silent: true });
+      setProgress(`${label} 원천 탭 접근 중...`, 25);
+      const data = await api('/api/clear-source-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: currentSettings(), target }),
+      });
+      setProgress(`${label} 원천/계산 보조 탭 비우기 완료`, 100);
+      setStatus(`${label} 원천데이터를 비웠습니다.\n` + JSON.stringify(data, null, 2), 'ok');
+      clearProgress();
+    }
+
+    document.addEventListener('change', e => {
+      const target = e.target;
+      if (target.dataset.role === 'column') {
+        const file = state.files[Number(target.dataset.index)];
+        file.columns[Number(target.dataset.col)].checked = target.checked;
+        renderFiles();
+      }
+      if (target.dataset.role === 'group-column') {
+        filesInGroup(target.dataset.groupKey).forEach(file => {
+          const column = file.columns.find(col => col.name === target.dataset.colName);
+          if (column) column.checked = target.checked;
+        });
+        renderFiles();
+      }
+      if (target.dataset.role === 'group-listbox') {
+        setGroupSelection(target.dataset.groupKey, selectedGroupIndexes(target.dataset.groupKey));
+      }
+      if (target.dataset.role === 'slot-input') {
+        const slot = uploadSlotByKey(target.dataset.slotKey);
+        if (!slot) return;
+        parseFiles(target.files, slot.sourceKey, { replaceSlot: true, slot })
+          .catch(err => {
+            setStatus(err.message, 'err');
+            clearProgress(0);
+          })
+          .finally(() => { target.value = ''; });
+      }
+      if (target.dataset.role === 'list-input') {
+        const group = uploadSlotGroups().find(item => item.groupKey === target.dataset.groupKey);
+        if (!group) return;
+        parseFiles(target.files, group.sourceKey, { slot: group })
+          .catch(err => {
+            setStatus(err.message, 'err');
+            clearProgress(0);
+          })
+          .finally(() => { target.value = ''; });
+      }
+      if (target.dataset.role === 'source') {
+        const file = state.files[Number(target.dataset.index)];
+        file.sourceKey = target.value;
+        file.slotKey = target.value;
+        file.groupKey = '';
+        file.periodYear = null;
+        file.periodMonth = null;
+        file.periodLabel = '';
+        file.sourceLocked = Boolean(target.value);
+        file.allowMissingColumns = false;
+        file.missingRequiredColumns = [];
+        if (target.value) {
+          applyDefaultColumnChecks(file, target.value);
+          file.missingRequiredColumns = missingColumnsForFile(file, target.value);
+          if (file.missingRequiredColumns.length) confirmMissingColumns(file, target.value);
+        }
+        renderFiles();
+        renderAssignmentPrompt();
+      }
+    });
+
+    document.addEventListener('click', e => {
+      const target = e.target;
+      if (target.dataset.role === 'remove') {
+        state.files.splice(Number(target.dataset.index), 1);
+        renderFiles();
+        renderAssignmentPrompt();
+      }
+      if (target.dataset.role === 'remove-group') {
+        state.files = state.files.filter(file => file.groupKey !== target.dataset.groupKey);
+        refreshListGroupPeriods();
+        renderFiles();
+        renderAssignmentPrompt();
+      }
+      if (target.dataset.role === 'slot-add') {
+        const input = document.querySelector(`input[data-role="slot-input"][data-slot-key="${cssEscape(target.dataset.slotKey)}"]`);
+        if (input) input.click();
+      }
+      if (target.dataset.role === 'slot-remove') {
+        clearSlot(target.dataset.slotKey);
+      }
+      if (target.dataset.role === 'list-add') {
+        const input = document.querySelector(`input[data-role="list-input"][data-group-key="${cssEscape(target.dataset.groupKey)}"]`);
+        if (input) input.click();
+      }
+      if (target.dataset.role === 'list-sort') {
+        sortListGroup(target.dataset.groupKey, target.dataset.direction);
+      }
+      if (target.dataset.role === 'list-move-selected') {
+        moveSelectedGroupFiles(target.dataset.groupKey, Number(target.dataset.delta));
+      }
+      if (target.dataset.role === 'list-remove-selected') {
+        removeSelectedGroupFiles(target.dataset.groupKey);
+      }
+      if (target.dataset.role === 'list-clear') {
+        clearListGroup(target.dataset.groupKey);
+      }
+      if (target.dataset.role === 'assign-slot') {
+        assignCurrentFile(target.dataset.slotKey).catch(err => {
+          setStatus(err.message, 'err');
+          clearProgress(0);
+          state.assigning = false;
+          renderAssignmentPrompt();
+        });
+      }
+      if (target.dataset.role === 'assign-skip') {
+        skipCurrentAssignmentFile();
+      }
+      if (target.dataset.role === 'assign-cancel') {
+        cancelBulkAssignment();
+      }
+    });
+
+    function runAction(fn) {
+      fn().catch(err => {
+        setStatus(err.message, 'err');
+        finishProgress(`오류: ${err.message}`, 'err', 7000);
+      });
+    }
+
+    $('saveSettings').onclick = () => runAction(() => saveSettings());
+    $('uploadServiceKey').onclick = () => runAction(() => uploadServiceKey());
+    $('uploadOAuthKey').onclick = () => runAction(() => uploadOAuthKey());
+    $('oauthLogin').onclick = () => runAction(() => startOAuth());
+    $('setupSheets').onclick = () => runAction(() => setupSheets());
+    $('loadScript').onclick = () => runAction(() => loadScript());
+    $('copyScript').onclick = () => runAction(() => copyScript());
+    $('installScript').onclick = () => runAction(() => installScript());
+    $('uploadData').onclick = () => runAction(() => uploadData());
+    $('exportExcel').onclick = () => runAction(() => exportExcel());
+    $('clearWorkSource').onclick = () => runAction(() => clearSourceData('work'));
+    $('clearWatchSource').onclick = () => runAction(() => clearSourceData('watch'));
+    $('clearFiles').onclick = () => { state.files = []; renderFiles(); renderAssignmentPrompt(); setStatus('목록을 비웠습니다.'); };
+    $('selectAll').onclick = () => { currentTargetFiles().forEach(f => f.columns.forEach(c => c.checked = true)); renderFiles(); };
+    $('selectDefaults').onclick = () => {
+      currentTargetFiles().forEach(f => f.columns.forEach(c => c.checked = !!c.defaultChecked));
+      renderFiles();
+      setStatus('기본 체크 상태로 복원했습니다.', 'ok');
+    };
+    function refreshPeriodSlots() {
+      renderFiles();
+      renderAssignmentPrompt();
+      if (currentUploadTarget() === 'watch') setStatus('상시감시보고서 월별 업로드 칸을 기준년월에 맞춰 갱신했습니다.', 'ok');
+    }
+    $('year').addEventListener('input', refreshPeriodSlots);
+    $('month').addEventListener('input', refreshPeriodSlots);
+    $('year').addEventListener('change', refreshPeriodSlots);
+    $('month').addEventListener('change', refreshPeriodSlots);
+    ['workId', 'watchId'].forEach(id => {
+      $(id).addEventListener('blur', normalizeSpreadsheetIdInputs);
+      $(id).addEventListener('change', normalizeSpreadsheetIdInputs);
+      $(id).addEventListener('paste', () => window.setTimeout(normalizeSpreadsheetIdInputs, 0));
+    });
+    document.querySelectorAll('input[name="uploadTarget"]').forEach(input => {
+      input.onchange = () => {
+        state.files.forEach(file => {
+          if (!file.sourceKey) return;
+          file.allowMissingColumns = false;
+          applyDefaultColumnChecks(file, file.sourceKey);
+          file.missingRequiredColumns = missingColumnsForFile(file, file.sourceKey);
+        });
+        renderSlotList();
+        renderFiles();
+        runAction(() => loadScript());
+        setStatus(`${currentUploadTarget() === 'watch' ? '상시감시보고서' : '업무보고서'} 기준 컬럼 체크로 전환했습니다.`, 'ok');
+      };
+    });
+
+    const drop = $('dropZone');
+    drop.onclick = () => $('fileInput').click();
+    drop.ondragover = e => { e.preventDefault(); drop.classList.add('drag'); };
+    drop.ondragleave = () => drop.classList.remove('drag');
+    drop.ondrop = e => {
+      e.preventDefault();
+      drop.classList.remove('drag');
+      startBulkAssignment(e.dataTransfer.files);
+    };
+    $('fileInput').onchange = e => {
+      startBulkAssignment(e.target.files);
+      e.target.value = '';
+    };
+    const slotList = $('slotList');
+    slotList.addEventListener('keydown', e => {
+      const select = e.target.closest('select[data-role="group-listbox"]');
+      if (!select) return;
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        removeSelectedGroupFiles(select.dataset.groupKey);
+      }
+      if (e.altKey && e.key === 'ArrowUp') {
+        e.preventDefault();
+        moveSelectedGroupFiles(select.dataset.groupKey, -1);
+      }
+      if (e.altKey && e.key === 'ArrowDown') {
+        e.preventDefault();
+        moveSelectedGroupFiles(select.dataset.groupKey, 1);
+      }
+    });
+    slotList.ondragover = e => {
+      const target = e.target.closest('[data-drop-slot-key], [data-drop-list-key]');
+      if (!target) return;
+      if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+      e.preventDefault();
+      target.classList.add('drag');
+    };
+    slotList.ondragleave = e => {
+      const target = e.target.closest('[data-drop-slot-key], [data-drop-list-key]');
+      if (!target || target.contains(e.relatedTarget)) return;
+      target.classList.remove('drag');
+    };
+    slotList.ondrop = e => {
+      const target = e.target.closest('[data-drop-slot-key], [data-drop-list-key]');
+      if (!target) return;
+      e.preventDefault();
+      target.classList.remove('drag');
+      if (!e.dataTransfer.files || !e.dataTransfer.files.length) return;
+      const slot = target.dataset.dropSlotKey ? uploadSlotByKey(target.dataset.dropSlotKey) : null;
+      const group = target.dataset.dropListKey ? uploadSlotGroups().find(item => item.groupKey === target.dataset.dropListKey) : null;
+      const targetSlot = slot || group;
+      if (!targetSlot) return;
+      parseFiles(e.dataTransfer.files, targetSlot.sourceKey, { replaceSlot: Boolean(slot), slot: targetSlot })
+        .catch(err => {
+          setStatus(err.message, 'err');
+          clearProgress(0);
+        });
+    };
+
+    document.addEventListener('dragover', e => {
+      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) e.preventDefault();
+    });
+    document.addEventListener('drop', e => {
+      if (e.target.closest('.drop') || e.target.closest('[data-drop-slot-key]') || e.target.closest('[data-drop-list-key]')) return;
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) e.preventDefault();
+    });
+
+    loadSettings()
+      .then(() => Promise.all([loadScript(), refreshOAuthStatus(true)]))
+      .catch(err => setStatus(err.message, 'err'));
+  </script>
+</body>
+</html>
