@@ -11,25 +11,25 @@ from typing import Any
 import pandas as pd
 from flask import Flask, abort, jsonify, render_template, request, send_file
 
-from jjukfund_app.apps_script_client import AppsScriptClient, AppsScriptInstallError
-from jjukfund_app.apps_script_oauth import (
+from report_generator_app.apps_script_client import AppsScriptClient, AppsScriptInstallError
+from report_generator_app.apps_script_oauth import (
     AppsScriptOAuthError,
     build_authorization_url,
     finish_oauth_callback,
     load_user_credentials,
     oauth_status,
 )
-from jjukfund_app.config import CREDENTIAL_DIR, OUTPUT_DIR, UPLOAD_DIR, ensure_dirs, extract_spreadsheet_id, load_config, save_config
-from jjukfund_app.excel_parser import (
+from report_generator_app.config import CREDENTIAL_DIR, OUTPUT_DIR, UPLOAD_DIR, ensure_dirs, extract_spreadsheet_id, load_config, save_config
+from report_generator_app.excel_parser import (
     ParseError,
     PasswordRequired,
     load_cached_dataframe,
     load_cached_metadata,
     parse_uploaded_file,
 )
-from jjukfund_app.local_excel import LocalExcelError, generate_local_excel
-from jjukfund_app.report_templates import setup_online_documents
-from jjukfund_app.schema import (
+from report_generator_app.local_excel import LocalExcelError, generate_local_excel
+from report_generator_app.report_templates import setup_online_documents
+from report_generator_app.schema import (
     SOURCE_SPECS,
     WATCH_REPORT_SHEETS,
     WORK_REPORT_SHEETS,
@@ -38,8 +38,8 @@ from jjukfund_app.schema import (
     missing_required_columns,
     source_options,
 )
-from jjukfund_app.sheets_client import GoogleSheetsClient, SheetsError
-from jjukfund_app.paths import RESOURCE_ROOT
+from report_generator_app.sheets_client import GoogleSheetsClient, SheetsError
+from report_generator_app.paths import RESOURCE_ROOT
 
 
 app = Flask(__name__, template_folder=str(RESOURCE_ROOT / "templates"))
@@ -82,7 +82,7 @@ def get_settings():
         "apps_script_oauth_json": cfg.get("apps_script_oauth_json", ""),
         "default_year": cfg.get("default_year", 2026),
         "default_month": cfg.get("default_month", 5),
-        "default_excel_password": cfg.get("default_excel_password", "118050"),
+        "default_excel_password": cfg.get("default_excel_password", ""),
         "source_options": source_options("work"),
     }
     return jsonify(safe_cfg)
@@ -242,7 +242,7 @@ def install_script():
         ]:
             script_id = cfg.get(cfg_key)
             if not script_id:
-                script_id = installer.create_bound_project(spreadsheet_id, "Jjukfund Online Calculator")
+                script_id = installer.create_bound_project(spreadsheet_id, "보고서 작성기 Online Calculator")
                 cfg[cfg_key] = script_id
             code = _apps_script_path_for_target(target).read_text(encoding="utf-8")
             installer.update_content(script_id, code)

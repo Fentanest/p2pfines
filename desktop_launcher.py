@@ -16,7 +16,7 @@ from urllib.request import urlopen
 from werkzeug.serving import WSGIRequestHandler, make_server
 
 from app import app as flask_app
-from jjukfund_app.paths import RESOURCE_ROOT
+from report_generator_app.paths import RESOURCE_ROOT
 
 
 DEFAULT_HOST = "127.0.0.1"
@@ -72,7 +72,7 @@ class LocalWebServer:
             self.port = int(server.server_port)
             thread = threading.Thread(
                 target=server.serve_forever,
-                name="jjukfund-web-server",
+                name="report-generator-web-server",
                 daemon=True,
             )
             self._server = server
@@ -140,7 +140,7 @@ class LauncherWindow:
         self._operation_lock = threading.Lock()
         self._ui_events: queue.SimpleQueue[Callable[[], None]] = queue.SimpleQueue()
 
-        root.title("Jjukfund 웹서버")
+        root.title("보고서 작성기 웹서버")
         root.geometry("420x245")
         root.minsize(380, 225)
         root.protocol("WM_DELETE_WINDOW", self.close)
@@ -149,7 +149,7 @@ class LauncherWindow:
         frame = ttk.Frame(root, padding=28)
         frame.pack(fill="both", expand=True)
 
-        ttk.Label(frame, text="Jjukfund", font=("Malgun Gothic", 20, "bold")).pack(pady=(2, 8))
+        ttk.Label(frame, text="보고서 작성기", font=("Malgun Gothic", 20, "bold")).pack(pady=(2, 8))
         ttk.Label(
             frame,
             text="로컬 보고서 업로더 웹페이지를 실행합니다.",
@@ -180,7 +180,7 @@ class LauncherWindow:
 
     def _begin_start(self) -> None:
         self._set_busy("시작 중...", "시작 중...")
-        threading.Thread(target=self._start_worker, name="jjukfund-start", daemon=True).start()
+        threading.Thread(target=self._start_worker, name="report-generator-start", daemon=True).start()
 
     def _start_worker(self) -> None:
         try:
@@ -202,7 +202,7 @@ class LauncherWindow:
 
     def _begin_stop(self) -> None:
         self._set_busy("종료 중...", "종료 중...")
-        threading.Thread(target=self._stop_worker, name="jjukfund-stop", daemon=True).start()
+        threading.Thread(target=self._stop_worker, name="report-generator-stop", daemon=True).start()
 
     def _stop_worker(self) -> None:
         try:
@@ -242,7 +242,7 @@ class LauncherWindow:
             return
         self._closing = True
         self._set_busy("종료 중...", "종료 중...")
-        threading.Thread(target=self._close_worker, name="jjukfund-close", daemon=True).start()
+        threading.Thread(target=self._close_worker, name="report-generator-close", daemon=True).start()
 
     def _close_worker(self) -> None:
         try:
@@ -285,7 +285,7 @@ def run_smoke_test(port: int) -> int:
         url = server.start()
         with urlopen(url, timeout=5.0) as response:
             html = response.read()
-        if response.status != 200 or b"Jjukfund" not in html:
+        if response.status != 200 or "보고서 작성기".encode("utf-8") not in html:
             raise RuntimeError("웹 UI 응답이 올바르지 않습니다.")
         with urlopen(f"{url}/api/apps-script?target=work", timeout=5.0) as response:
             script_payload = json.loads(response.read().decode("utf-8"))
@@ -297,7 +297,7 @@ def run_smoke_test(port: int) -> int:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Jjukfund Windows launcher")
+    parser = argparse.ArgumentParser(description="보고서 작성기 Windows launcher")
     parser.add_argument("--no-browser", action="store_true", help="서버 시작 시 브라우저를 자동으로 열지 않습니다.")
     parser.add_argument("--smoke-test", action="store_true", help="서버와 웹 UI를 검사한 뒤 즉시 종료합니다.")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help=argparse.SUPPRESS)

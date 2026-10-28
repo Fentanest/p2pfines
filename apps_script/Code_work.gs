@@ -1,5 +1,5 @@
 /**
- * Jjukfund online work-report calculator.
+ * 보고서 작성기 online work-report calculator.
  *
  * This file is installed only in the 업무보고서 spreadsheet.
  * Trace path: raw tabs -> 계산_* tabs -> PL report tabs -> 검증/실행로그
@@ -26,7 +26,7 @@ const RUN_CHECKBOX_CELL = 'B7';
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui
-    .createMenu('Jjukfund')
+    .createMenu('보고서 작성기')
     .addItem('보고서 재계산', 'recalculateAllReportsWithNotice')
     .addSeparator()
     .addItem('실행 버튼 만들기/갱신', 'setupRunButton')
@@ -50,14 +50,14 @@ function onEdit(e) {
 function recalculateAllReportsWithNotice() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const startedAt = new Date();
-  ss.toast('보고서 재계산을 시작했습니다.', 'Jjukfund', 5);
+  ss.toast('보고서 재계산을 시작했습니다.', '보고서 작성기', 5);
   try {
     recalculateAllReports();
     setupRunButton({ silent: true });
     const seconds = Math.round((new Date().getTime() - startedAt.getTime()) / 1000);
-    ss.toast('보고서 재계산을 완료했습니다. (' + seconds + '초)', 'Jjukfund', 10);
+    ss.toast('보고서 재계산을 완료했습니다. (' + seconds + '초)', '보고서 작성기', 10);
   } catch (error) {
-    ss.toast('보고서 재계산 실패: ' + error.message, 'Jjukfund', 10);
+    ss.toast('보고서 재계산 실패: ' + error.message, '보고서 작성기', 10);
     throw error;
   }
 }
@@ -83,7 +83,7 @@ function setupRunButton(options) {
 
   sheet.getRange('A1:D1')
     .merge()
-    .setValue('Jjukfund 보고서 실행')
+    .setValue('보고서 작성기 보고서 실행')
     .setFontWeight('bold')
     .setFontSize(18)
     .setFontColor('#ffffff')
@@ -117,7 +117,7 @@ function setupRunButton(options) {
   sheet.getRange('B9:D11').setValues([
     ['실행 방법', '상태', '비고'],
     ['시트 버튼', 'B7 체크', '계산 완료 후 자동 해제'],
-    ['상단 메뉴', 'Jjukfund > 보고서 재계산', '시트를 다시 열면 메뉴 표시'],
+    ['상단 메뉴', '보고서 작성기 > 보고서 재계산', '시트를 다시 열면 메뉴 표시'],
   ]);
   sheet.getRange('B9:D9')
     .setFontWeight('bold')
@@ -127,7 +127,7 @@ function setupRunButton(options) {
 
   if (!options || !options.silent) {
     ss.setActiveSheet(sheet);
-    ss.toast('실행 버튼을 준비했습니다.', 'Jjukfund', 5);
+    ss.toast('실행 버튼을 준비했습니다.', '보고서 작성기', 5);
   }
 }
 

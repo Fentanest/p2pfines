@@ -180,7 +180,7 @@ def _try_convert_with_excel(path: Path, password: str | None = None) -> Path | N
     except Exception:
         return None
 
-    tmpdir = Path(tempfile.mkdtemp(prefix="jjukfund_xls_"))
+    tmpdir = Path(tempfile.mkdtemp(prefix="report_generator_xls_"))
     output = tmpdir / f"{path.stem}.xlsx"
     excel = None
     workbook = None

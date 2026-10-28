@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 
-APP_NAME = "Jjukfund"
+APP_NAME = "ReportGenerator"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 IS_FROZEN = bool(getattr(sys, "frozen", False))
 
@@ -20,7 +20,7 @@ def _resource_root() -> Path:
 
 
 def _data_root() -> Path:
-    override = os.environ.get("JJUKFUND_DATA_DIR", "").strip()
+    override = os.environ.get("REPORT_GENERATOR_DATA_DIR", "").strip()
     if override:
         return Path(override).expanduser().resolve()
     if not IS_FROZEN:

@@ -20,7 +20,7 @@ class LocalWebServerTests(unittest.TestCase):
                 self.assertIn(b'"ok":true', response.read())
             with urlopen(url, timeout=2) as response:
                 self.assertEqual(response.status, 200)
-                self.assertIn(b"Jjukfund", response.read())
+                self.assertIn("보고서 작성기".encode("utf-8"), response.read())
         finally:
             server.stop()
         self.assertFalse(server.running)

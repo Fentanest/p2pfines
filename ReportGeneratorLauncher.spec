@@ -47,7 +47,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="JjukfundLauncher",
+    name="ReportGeneratorLauncher",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -67,5 +67,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name="JjukfundLauncher",
+    name="ReportGeneratorLauncher",
 )

@@ -1,16 +1,17 @@
-# ---- Excel / spreadsheet & data files ----
-*.xls
-*.xlsx
-*.xlsm
-*.xlsb
-*.xlt
-*.xltx
-*.xltm
-*.xla
-*.xlam
-*.ods
-*.csv
-*.tsv
+# ---- Excel / spreadsheet & data files (case-insensitive) ----
+*.[xX][lL][sS]
+*.[xX][lL][sS][xX]
+*.[xX][lL][sS][mM]
+*.[xX][lL][sS][bB]
+*.[xX][lL][tT]
+*.[xX][lL][tT][xX]
+*.[xX][lL][tT][mM]
+*.[xX][lL][aA]
+*.[xX][lL][aA][mM]
+*.[xX][lL][wW]
+*.[oO][dD][sS]
+*.[cC][sS][vV]
+*.[tT][sS][vV]
 *.parquet
 *.feather
 *.pkl
@@ -48,6 +49,8 @@ id_ed25519*
 *.secret
 secrets/
 .clasprc*
+*oauth*token*
+*.credentials
 
 # ---- Project data / generated output ----
 .uploads/
@@ -63,8 +66,11 @@ __pycache__/
 *.egg-info/
 .eggs/
 .venv/
+.venv*/
 venv/
 env/
+*-venv/
+*.egg
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -100,6 +106,13 @@ coverage/
 *.rar
 *.tar
 *.tar.gz
+*.pyz
+*.pkg
+*.dmg
+*.jar
+*.war
+*.apk
+*.iso
 *.tgz
 *.gz
 *.bz2

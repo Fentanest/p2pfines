@@ -4,7 +4,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$SpecPath = Join-Path $ProjectRoot "JjukfundLauncher.spec"
+$SpecPath = Join-Path $ProjectRoot "ReportGeneratorLauncher.spec"
 
 if (-not $IsWindows -and $PSVersionTable.PSEdition -eq "Core") {
     throw "Windows에서만 빌드할 수 있습니다."
@@ -25,7 +25,7 @@ try {
     Pop-Location
 }
 
-$ExePath = Join-Path $ProjectRoot "dist\JjukfundLauncher\JjukfundLauncher.exe"
+$ExePath = Join-Path $ProjectRoot "dist\ReportGeneratorLauncher\ReportGeneratorLauncher.exe"
 if (-not (Test-Path $ExePath)) {
     throw "빌드 결과를 찾지 못했습니다: $ExePath"
 }

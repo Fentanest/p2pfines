@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jjukfund 보고서 온라인 업로더</title>
+  <title>보고서 작성기 보고서 온라인 업로더</title>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -345,7 +345,7 @@
 </head>
 <body>
   <header>
-    <h1>Jjukfund 보고서 온라인 업로더</h1>
+    <h1>보고서 작성기 보고서 온라인 업로더</h1>
     <span>로컬 파이썬은 산출하지 않음 · 계산은 Google Sheets Apps Script</span>
   </header>
 
@@ -398,7 +398,7 @@
       <h2>온라인 계산 스크립트</h2>
       <div class="muted">
         아래 코드는 구글 스프레드시트의 Apps Script 프로젝트 안에서만 산출합니다.
-        `Apps Script 직접 설치 시도`로 문서에 설치하고, 구글시트의 `실행` 탭 또는 `Jjukfund` 메뉴에서 실행하세요.
+        `Apps Script 직접 설치 시도`로 문서에 설치하고, 구글시트의 `실행` 탭 또는 `보고서 작성기` 메뉴에서 실행하세요.
       </div>
       <div class="actions">
         <button id="loadScript">스크립트 불러오기</button>
@@ -691,7 +691,7 @@
       $('oauthJsonPath').value = data.apps_script_oauth_json || '';
       $('year').value = data.default_year || '';
       $('month').value = data.default_month || '';
-      $('excelPassword').value = data.default_excel_password || '118050';
+      $('excelPassword').value = data.default_excel_password || '';
       renderSlotList();
     }
 
@@ -799,7 +799,7 @@
         body: JSON.stringify(currentSettings()),
       });
       $('oauthJsonPath').value = data.clientJson;
-      const popup = window.open(data.authUrl, 'jjukfundGoogleOAuth', 'width=720,height=760');
+      const popup = window.open(data.authUrl, 'reportGeneratorGoogleOAuth', 'width=720,height=760');
       if (!popup) window.location.href = data.authUrl;
       setProgress('Google 인증 창 대기 중...', 80);
       setStatus('Google 인증 창을 열었습니다. 권한 승인 후 이 화면으로 돌아와 Apps Script 직접 설치를 다시 누르세요.', 'ok');
@@ -1091,7 +1091,7 @@
       const data = await res.json();
       if (res.ok && data.ok !== false) return data;
       if (data.needPassword) {
-        const input = window.prompt(`${file.name} 파일 비밀번호를 입력해주세요.`, $('excelPassword').value || '118050');
+        const input = window.prompt(`${file.name} 파일 비밀번호를 입력해주세요.`, $('excelPassword').value || '');
         if (!input) throw new Error('비밀번호 입력이 취소되었습니다.');
         $('excelPassword').value = input;
         return parseOneFile(file, input, sourceKey);
@@ -1447,7 +1447,7 @@
         body: JSON.stringify({ settings: currentSettings(), items, targets, mode: 'replace' }),
       });
       setProgress('업로드 결과 정리 중...', 95);
-      setStatus('원천 데이터 업로드 완료.\n이제 구글시트에서 Jjukfund > 보고서 재계산을 실행하세요.\n' + JSON.stringify(data.uploaded || [], null, 2), 'ok');
+      setStatus('원천 데이터 업로드 완료.\n이제 구글시트에서 보고서 작성기 > 보고서 재계산을 실행하세요.\n' + JSON.stringify(data.uploaded || [], null, 2), 'ok');
       finishProgress(`원천 데이터 업로드 완료: ${items.length}개 파일`, 'ok', 6000);
     }
 

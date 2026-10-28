@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import Any
 
@@ -46,7 +47,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "apps_script_oauth_json": _default_oauth_path(),
     "default_year": 2026,
     "default_month": 5,
-    "default_excel_password": "118050",
+    "default_excel_password": os.environ.get("REPORT_GENERATOR_EXCEL_PASSWORD", ""),
 }
 
 
