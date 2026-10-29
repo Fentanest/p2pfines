@@ -3,10 +3,7 @@
 이 프로젝트는 로컬에서 보고서 값을 산출하지 않는다. 로컬 웹 UI는 백데이터 파일을 읽어 선택한 원천 컬럼만 구글 스프레드시트에 업로드하고, 보고서 계산/검증/추적은 구글 스프레드시트의 Apps Script에서 수행한다.
 
 ## 실행
-
-```powershell
-& 'C:\Users\Administrator\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' app.py
-```
+빌드 후 exe파일 실행
 
 웹 UI: http://127.0.0.1:8787
 
